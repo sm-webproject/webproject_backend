@@ -1,0 +1,32 @@
+name: PR Confirm
+
+on:
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python all python version
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          architecture: x64
+
+      - name: Export Requirements
+        run: |
+          pip3 install poetry
+          poetry export -f requirements.txt --without-hashes --output requirements.txt
+
+      - name: Install Requirements
+        run: pip3 install -r requirements.txt
+
+      - name: Install pylint
+        run: pip3 install pylint
+
+      - name: Run pylint
+        run: pylint app

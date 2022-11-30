@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "executing pre-commit"
+echo "커밋 전 pylint를 확인하여 코드 품질을 유지합니다"
+pylint app/main.py app/db.py app/env.py app/routes app/utils app/models app/schemas

@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    env:
+      AWS_ECR: ${{ secrets.AWS_ECR }}
+      IMAGE_TAG: latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Target Lambda
+        run: |
+          if [ "${{github.base_ref}}" == "main" ] || [ "${{github.ref}}" == "refs/heads/main" ]; then
+            LAMBDA=${{ secrets.AWS_LAMBDA }}
+            echo "Select Production Lambda"
+            echo "LAMBDA=${{ secrets.AWS_LAMBDA }}" >> $GITHUB_ENV
+          else
+            LAMBDA=${{ secrets.AWS_LAMBDA_TEST }}
+            echo "LAMBDA=${{ secrets.AWS_LAMBDA_TEST }}" >> $GITHUB_ENV
+            echo "Select Development Lambda"
+          fi
+          
+          if [ -z $LAMBDA ]; then
+            echo "LAMBDA is not define"
+            exit 1
+          fi
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        # for arm
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Build, tag, and push image to Amazon ECR
+        uses: docker/build-push-action@v2
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ steps.login-ecr.outputs.repo }}
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.AWS_ECR }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # for arm
+          platforms: linux/arm64
+      - name: Deploy Lambda
+        run: aws lambda update-function-code --function-name ${{env.LAMBDA}} --image-uri ${{ secrets.AWS_ECR }}:${{ env.IMAGE_TAG }}
+

@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "devfive-backend-system"
+version = "0.1.0"
+description = "devfive backend system"
+authors = ["devfive"]
+readme = "README.md"
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.scripts]
+start = "start:main"
+commit = "start:commit"
+lint = "start:lint"
+push = "start:push"
+
+[tool.poetry.dependencies]
+python = "3.9.*"
+alembic = "1.8.1"
+boto3 = "1.26.17"
+fastapi = "0.85.1"
+fastapi-camelcase = "1.0.5"
+fastapi-crudrouter = "0.8.5"
+fastapi-sqlalchemy = "0.2.1"
+firebase-admin = "6.0.0"
+mangum = "0.17.0"
+nanoid = "2.0.0"
+pydantic = "1.10.2"
+pyhumps = "3.8.0"
+pyJWT = "2.6.0"
+sqlalchemy = "1.4.44"
+python-dotenv = "0.21.0"
+python-multipart = "0.0.5"
+sqlalchemy-utils = "0.38.3"
+passlib = "1.7.4"
+pg8000 = "1.29.3"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "2.15.6"
+uvicorn = "0.20.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
