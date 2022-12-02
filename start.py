@@ -4,7 +4,7 @@ import sys
 
 def main():
     os.chdir('app')
-    os.system("uvicorn main:app --reload")
+    os.system("uvicorn main:app --reload --host 192.168.0.2 --port 8000")
 
 
 def commit():
