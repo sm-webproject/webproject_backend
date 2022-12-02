@@ -13,6 +13,7 @@ from starlette.middleware.gzip import GZipMiddleware
 
 from db import SQLALCHEMY_DATABASE_URL
 from env import STAGE
+from routes.board import board_router
 from routes.user import user_router
 
 app = FastAPI(title="데브파이브", description="데브파이브 백엔드",
@@ -68,6 +69,7 @@ app.add_middleware(DBSessionMiddleware,
                    db_url=SQLALCHEMY_DATABASE_URL)
 
 app.include_router(user_router)
+app.include_router(board_router)
 
 
 @app.get("/")
