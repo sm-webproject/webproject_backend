@@ -29,9 +29,9 @@ def create_board(payload: BoardCreate):
         raise HTTPException(402, e) from None
     db.session.commit()
 
-    user = db.session.query(BoardModel).first()
+    db.session.refresh(added_model)
 
-    return user
+    return added_model
 
 
 @board_router.delete("/{board_id}", tags=["Boards"])
