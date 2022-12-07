@@ -2,6 +2,7 @@ import datetime
 
 from fastapi import APIRouter, HTTPException
 from fastapi_sqlalchemy import db
+from sqlalchemy import desc
 
 from models.board import BoardModel
 from schemas.board import BoardCreate, BoardUpdate
@@ -12,7 +13,7 @@ board_router = APIRouter(tags=["Boards"], prefix="/boards")
 
 @board_router.get("", tags=["Boards"])
 def get_board_all():
-    data = db.session.query(BoardModel).all()
+    data = db.session.query(BoardModel).order_by(desc(BoardModel.board_id)).all()
     return data
 
 
